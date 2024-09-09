@@ -1,5 +1,6 @@
 import sys
 import numpy as np
+import qtvscodestyle as qtvsc
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QFileDialog, QLabel
 from src.model_training import load_model, generate_notes
 from src.midi_utils import create_midi_from_notes
@@ -50,6 +51,29 @@ class MusicGeneratorApp(QWidget):
 
 def start_gui():
     app = QApplication(sys.argv)
+    stylesheet = qtvsc.load_stylesheet(qtvsc.Theme.DARK_VS)
+    
+    custom_button_style = """
+    QPushButton {
+        background-color: #323232; 
+        color: #FFF;  
+        border: 1px solid #555; 
+        border-radius: 10px;  
+        padding: 5px;  
+    }
+    QPushButton:hover {
+        background-color: #444; 
+        color: #FFF;  
+        border: 1px solid #666;  
+    }
+    QPushButton:pressed {
+        background-color: #555;  
+        color: #FFF; 
+        border: 1px solid #777; 
+    }
+    """
+    
+    app.setStyleSheet(stylesheet + custom_button_style)
     gui = MusicGeneratorApp()
     gui.show()
     sys.exit(app.exec_())
