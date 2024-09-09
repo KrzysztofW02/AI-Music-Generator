@@ -1,7 +1,7 @@
 import pickle
 import numpy as np
 
-data_path = r"lmd_full\processed_midi_data.pkl" 
+data_path = r"lmd_full\processed_midi_data.pkl"
 
 def load_midi_data(data_path):
     with open(data_path, 'rb') as f:
@@ -30,3 +30,8 @@ def preprocess_data(all_midi_notes, sequence_length=50):
 
     return inputs, targets
 
+all_midi_notes = load_midi_data(data_path)
+inputs, targets = preprocess_data(all_midi_notes)
+
+with open(data_path, 'wb') as f:
+    pickle.dump((inputs, targets), f)
