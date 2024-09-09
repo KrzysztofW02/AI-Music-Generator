@@ -5,7 +5,7 @@ from tensorflow.keras.layers import LSTM, Dense
 
 model_file_path = 'models/music_generation_model.h5'
 
-def crate_model(sequence_length):
+def create_model(sequence_length):
     model = Sequential()
     model.add(LSTM(128, input_shape=(sequence_length, 1), return_sequences=True))
     model.add(LSTM(128))
