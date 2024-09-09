@@ -1,3 +1,4 @@
+import numpy as np
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense
@@ -22,3 +23,14 @@ def save_model(model, model_file_path):
 def load_model(model_file_path):
     model = tf.keras.models.load_model(model_file_path)
     return model
+
+def generate_notes(model, seed_sequence, num_notes=100):
+    generated_notes = []
+    current_sequence = seed_sequence
+
+    for _ in range (num_notes):
+        prediction = model.predict(current_sequence)
+        generated_notes.append(prediction[0][0])
+        current_sequence = np.append(current_sequence[:, 1:, :], [[prediction]], axis=1)
+
+    return generated_notes
