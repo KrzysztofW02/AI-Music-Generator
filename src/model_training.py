@@ -28,9 +28,14 @@ def generate_notes(model, seed_sequence, num_notes=100):
     generated_notes = []
     current_sequence = seed_sequence
 
-    for _ in range (num_notes):
+    for _ in range(num_notes):
         prediction = model.predict(current_sequence)
-        generated_notes.append(prediction[0][0])
-        current_sequence = np.append(current_sequence[:, 1:, :], [[prediction]], axis=1)
+        
+        clipped_prediction = np.clip(prediction[0][0], 0, 127)
+        generated_notes.append(clipped_prediction)
+        clipped_prediction = np.reshape(clipped_prediction, (1, 1, 1))
+        current_sequence = np.append(current_sequence[:, 1:, :], clipped_prediction, axis=1)
 
     return generated_notes
+
+
