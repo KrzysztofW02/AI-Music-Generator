@@ -1,10 +1,11 @@
+import os
 import sys
+import subprocess
 import numpy as np
 import qtvscodestyle as qtvsc
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QFileDialog, QLabel
 from src.model_training import load_model, generate_notes
 from src.midi_utils import create_midi_from_notes
-
 class MusicGeneratorApp(QWidget):
     def __init__(self):
         super().__init__()
@@ -25,8 +26,11 @@ class MusicGeneratorApp(QWidget):
         self.generate_button.clicked.connect(self.generate_music)
         self.layout.addWidget(self.generate_button)
 
-        self.setLayout(self.layout)
+        self.open_midi_button = QPushButton('Open MIDI File', self)
+        self.open_midi_button.clicked.connect(self.open_midi_dialog)
+        self.layout.addWidget(self.open_midi_button)
 
+        self.setLayout(self.layout)
         self.model = None
 
     def load_model_dialog(self):
@@ -41,13 +45,29 @@ class MusicGeneratorApp(QWidget):
             print("No model loaded!")
             return
 
-        seed_sequence = [[0.5]] * 50
-        seed_sequence = np.array(seed_sequence).reshape(1, 50, 1)
-
+        seed_sequence = np.random.rand(1, 50, 1)  
         generated_notes = generate_notes(self.model, seed_sequence)
 
-        create_midi_from_notes(generated_notes, 'data/generated_music.mid')
-        print("Music generated and saved to 'data/generated_music.mid'")
+        midi_file_path = 'C:/Users/Darkr/Desktop/Python/AI-Music-Generator/data/generated_music.mid'
+        create_midi_from_notes(generated_notes, midi_file_path)
+        print(f"Music generated and saved to '{midi_file_path}'")
+
+        self.open_midi_file(midi_file_path)
+
+    def open_midi_dialog(self):
+        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+        midi_file_path, _ = QFileDialog.getOpenFileName(self, "Open MIDI File", base_dir, "MIDI Files (*.mid)")
+
+        if midi_file_path:
+            self.open_midi_file(midi_file_path)
+
+    def open_midi_file(self, file_path):
+        if sys.platform.startswith('win'):
+            os.startfile(file_path)  
+        elif sys.platform.startswith('darwin'):
+            subprocess.call(('open', file_path))  
+        elif sys.platform.startswith('linux'):
+            subprocess.call(('xdg-open', file_path))  
 
 def start_gui():
     app = QApplication(sys.argv)
@@ -77,3 +97,4 @@ def start_gui():
     gui = MusicGeneratorApp()
     gui.show()
     sys.exit(app.exec_())
+
