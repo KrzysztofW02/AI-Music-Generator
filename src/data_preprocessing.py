@@ -2,7 +2,7 @@ import pickle
 import numpy as np
 
 data_path = r"lmd_full\processed_midi_data.pkl"
-processed_data_path = r"data\preprocessed_data_chunked.pkl"
+processed_data_path = r"data\preprocessed_data.pkl"
 
 def load_midi_data(data_path):
     all_midi_notes = []
