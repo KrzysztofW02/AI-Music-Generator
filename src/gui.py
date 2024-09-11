@@ -3,9 +3,9 @@ import sys
 import subprocess
 import numpy as np
 import qtvscodestyle as qtvsc
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QFileDialog, QLabel
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QFileDialog, QLabel, QComboBox
 from src.model_training import load_model, generate_notes
-from src.midi_utils import create_midi_from_notes
+from src.midi_utils import create_midi_from_notes, instrument_programs
 class MusicGeneratorApp(QWidget):
     def __init__(self):
         super().__init__()
@@ -21,6 +21,10 @@ class MusicGeneratorApp(QWidget):
         self.load_button = QPushButton('Load Model', self)
         self.load_button.clicked.connect(self.load_model_dialog)
         self.layout.addWidget(self.load_button)
+
+        self.instrument_dropdown = QComboBox(self)
+        self.instrument_dropdown.addItems(instrument_programs.keys())
+        self.layout.addWidget(self.instrument_dropdown)
 
         self.generate_button = QPushButton('Generate Music', self)
         self.generate_button.clicked.connect(self.generate_music)
@@ -49,7 +53,8 @@ class MusicGeneratorApp(QWidget):
         generated_notes = generate_notes(self.model, seed_sequence)
 
         midi_file_path = 'C:/Users/Darkr/Desktop/Python/AI-Music-Generator/data/generated_music.mid'
-        create_midi_from_notes(generated_notes, midi_file_path)
+        selected_instrument = self.instrument_dropdown.currentText()
+        create_midi_from_notes(generated_notes, midi_file_path, instrument_name=selected_instrument)
         print(f"Music generated and saved to '{midi_file_path}'")
 
         self.open_midi_file(midi_file_path)

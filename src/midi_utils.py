@@ -1,16 +1,24 @@
 import pretty_midi
 import numpy as np
 
-def create_midi_from_notes(notes, output_file='generated_music.mid'):
+instrument_programs = {
+    "Acustic Grand Piano": 0,
+    "Electric Guitar": 27,
+    "Violin": 40,
+    "Trumpet": 56,
+    "Flute": 73
+}
+
+def create_midi_from_notes(notes, output_file='generated_music.mid', instrument_name="Acoustic Grand Piano"):
     midi = pretty_midi.PrettyMIDI()
-    instrument = pretty_midi.Instrument(program=0)
+    
+    program = instrument_programs.get(instrument_name, 0)  
+    instrument = pretty_midi.Instrument(program=program)
 
     for i, note in enumerate(notes):
-        midi_note_pitch = int(np.clip(note, 0, 127))
-        
         midi_note = pretty_midi.Note(
             velocity=100,
-            pitch=midi_note_pitch, 
+            pitch=int(note), 
             start=i * 0.5,
             end=(i + 1) * 0.5
         )
@@ -18,4 +26,4 @@ def create_midi_from_notes(notes, output_file='generated_music.mid'):
 
     midi.instruments.append(instrument)
     midi.write(output_file)
-    print(f'MIDI file saved to {output_file}')
+    print(f'MIDI file saved to {output_file} with instrument: {instrument_name}')
