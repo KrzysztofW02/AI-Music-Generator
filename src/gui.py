@@ -6,6 +6,8 @@ import qtvscodestyle as qtvsc
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QFileDialog, QLabel, QComboBox
 from src.model_training import load_model, generate_notes
 from src.midi_utils import create_midi_from_notes, instrument_programs
+from pathlib import Path
+
 class MusicGeneratorApp(QWidget):
     def __init__(self):
         super().__init__()
@@ -49,15 +51,21 @@ class MusicGeneratorApp(QWidget):
             print("No model loaded!")
             return
 
-        seed_sequence = np.random.rand(1, 50, 1)  
-        generated_notes = generate_notes(self.model, seed_sequence)
+        seed_sequence_length = np.random.randint(40, 60)
+        seed_sequence = np.random.rand(1, seed_sequence_length, 1)
 
-        midi_file_path = 'C:/Users/Darkr/Desktop/Python/AI-Music-Generator/data/generated_music.mid'
+        num_notes = np.random.randint(150, 200)  
+        generated_notes = generate_notes(self.model, seed_sequence, num_notes=num_notes, temperature=0.8)
+        base_dir = Path(__file__).resolve().parent.parent
+        midi_file_path = base_dir / 'data' / 'generated_music.mid'
         selected_instrument = self.instrument_dropdown.currentText()
-        create_midi_from_notes(generated_notes, midi_file_path, instrument_name=selected_instrument)
+        midi_file_path_str = str(midi_file_path)
+        create_midi_from_notes(generated_notes, midi_file_path_str, instrument_name=selected_instrument)
         print(f"Music generated and saved to '{midi_file_path}'")
 
         self.open_midi_file(midi_file_path)
+
+
 
     def open_midi_dialog(self):
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
