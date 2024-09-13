@@ -28,10 +28,11 @@ def load_model(model_file_path):
     return model
 
 def sample_with_temperature(predictions, temperature=1.0):
-    predictions = np.log(predictions) / temperature
-    probabilities = tf.nn.softmax(predictions).numpy()
+    note = predictions[0][0] 
+    note_with_noise = note + np.random.normal(0, temperature * 5) 
+    note_with_noise = np.clip(note_with_noise, 0, 127)
 
-    return np.random.choice(len(probabilities), p=probabilities)
+    return note_with_noise
 
 C_major_scale = [60, 62, 64, 65, 67, 69, 71, 72]  
 
@@ -44,7 +45,7 @@ def generate_notes(model, seed_sequence, num_notes=100, temperature=1.0):
     current_sequence = seed_sequence
 
     for _ in range(num_notes):
-        prediction = model.predict(current_sequence)[0][0]
+        prediction = model.predict(current_sequence)
         prediction = np.clip(prediction, 0, 127)
         next_note = sample_with_temperature(prediction, temperature=temperature)
         generated_notes.append(next_note)
