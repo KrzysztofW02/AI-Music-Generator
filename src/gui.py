@@ -3,7 +3,8 @@ import sys
 import subprocess
 import numpy as np
 import qtvscodestyle as qtvsc
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QFileDialog, QLabel, QComboBox
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QFileDialog, QLabel, QComboBox, QHBoxLayout, QSpacerItem, QSizePolicy
+from PyQt5.QtCore import Qt
 from src.model_training import load_model, generate_notes
 from src.midi_utils import create_midi_from_notes, instrument_programs
 from pathlib import Path
@@ -13,28 +14,32 @@ class MusicGeneratorApp(QWidget):
         super().__init__()
 
         self.setWindowTitle('AI Music Generator')
-        self.setGeometry(100, 100, 300, 150)
+        self.setGeometry(300, 300, 600, 150)
 
         self.layout = QVBoxLayout()
-
         self.model_label = QLabel('No model loaded', self)
+        self.model_label.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(self.model_label)
-
+        
+        self.top_layout = QHBoxLayout()
         self.load_button = QPushButton('Load Model', self)
         self.load_button.clicked.connect(self.load_model_dialog)
-        self.layout.addWidget(self.load_button)
-
-        self.instrument_dropdown = QComboBox(self)
-        self.instrument_dropdown.addItems(instrument_programs.keys())
-        self.layout.addWidget(self.instrument_dropdown)
-
-        self.generate_button = QPushButton('Generate Music', self)
-        self.generate_button.clicked.connect(self.generate_music)
-        self.layout.addWidget(self.generate_button)
+        self.top_layout.addWidget(self.load_button)
 
         self.open_midi_button = QPushButton('Open MIDI File', self)
         self.open_midi_button.clicked.connect(self.open_midi_dialog)
-        self.layout.addWidget(self.open_midi_button)
+        self.top_layout.addWidget(self.open_midi_button)
+
+        self.instrument_dropdown = QComboBox(self)
+        self.instrument_dropdown.addItems(instrument_programs.keys())
+        self.top_layout.addWidget(self.instrument_dropdown)
+
+        self.layout.addLayout(self.top_layout)
+
+        self.layout.addSpacerItem(QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.Fixed))
+        self.generate_button = QPushButton('Generate Music', self)
+        self.generate_button.clicked.connect(self.generate_music)
+        self.layout.addWidget(self.generate_button)
 
         self.setLayout(self.layout)
         self.model = None
