@@ -1,8 +1,9 @@
 import pickle
 import numpy as np
+from pathlib import Path
 
-data_path = r"lmd_full\processed_midi_data.pkl"
-processed_data_path = r"data\preprocessed_data.pkl"
+data_path = base_dir = Path(__file__).resolve().parent.parent / 'data' / 'processed_midi_data.pkl'
+processed_data_path = base_dir = Path(__file__).resolve().parent.parent / 'data' / 'preprocessed_data.pkl'
 
 def load_midi_data(data_path):
     all_midi_notes = []

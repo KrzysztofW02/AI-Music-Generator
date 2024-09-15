@@ -1,20 +1,25 @@
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Bidirectional, Dense, LSTM
+from tensorflow.keras.layers import Bidirectional, Dense, LSTM, Dropout, BatchNormalization
 
 model_file_path = 'models/music_generation_model.h5'
 
-
 def create_model(sequence_length):
     model = Sequential()
-    model.add(Bidirectional(LSTM(128, input_shape=(sequence_length, 1), return_sequences=True)))
+    model.add(Bidirectional(LSTM(256, input_shape=(sequence_length, 1), return_sequences=True)))
+    model.add(BatchNormalization())
+    model.add(Dropout(0.3))
+    model.add(Bidirectional(LSTM(256, return_sequences=True)))
+    model.add(BatchNormalization())
+    model.add(Dropout(0.3))
     model.add(Bidirectional(LSTM(128)))
-    model.add(Dense(128, activation='relu')) 
-    model.add(Dense(1, activation='linear'))  
+    model.add(BatchNormalization())
+    model.add(Dropout(0.3))
+    model.add(Dense(128, activation='relu'))
+    model.add(Dense(4, activation='linear'))
     model.compile(optimizer='adam', loss='mean_squared_error')
     return model
-
 
 def train_model(model, inputs, targets, epochs=20, batch_size=64):
     history = model.fit(inputs, targets, epochs=epochs, batch_size=batch_size)

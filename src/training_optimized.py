@@ -2,8 +2,9 @@ import pickle
 import numpy as np
 from model_training import create_model, train_model, save_model
 from tensorflow.keras.callbacks import EarlyStopping
+from pathlib import Path
 
-processed_data_path = r"C:\Users\Darkr\Desktop\Python\AI-Music-Generator\data\preprocessed_data.pkl"
+processed_data_path = base_dir = Path(__file__).resolve().parent.parent / 'data' / 'preprocessed_data.pkl'
 
 sequence_length = 50
 batch_size = 128  
