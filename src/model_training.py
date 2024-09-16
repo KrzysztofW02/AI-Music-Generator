@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+import random
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Bidirectional, Dense, LSTM, Dropout, BatchNormalization
 
@@ -39,10 +40,13 @@ def sample_with_temperature(predictions, temperature=1.0):
 
     return note_with_noise
 
-C_major_scale = [60, 62, 64, 65, 67, 69, 71, 72]  
+C_major_scale = [60, 62, 64, 65, 67, 69, 71, 72]
+G_major_scale = [59, 62, 64, 66, 67, 69, 71, 72]
+F_major_scale = [60, 62, 63, 65, 67, 69, 70, 72] 
 
-def constrain_to_scale(note, scale):
-    closest_note = min(scale, key=lambda x: abs(x - note))  
+def constrain_to_scale(note):
+    chosen_scale = random.choice([C_major_scale, G_major_scale, F_major_scale])
+    closest_note = min(chosen_scale, key=lambda x: abs(x - note))
     return closest_note
 
 def generate_notes(model, seed_sequence, num_notes=100, temperature=1.0):
@@ -53,9 +57,10 @@ def generate_notes(model, seed_sequence, num_notes=100, temperature=1.0):
         prediction = model.predict(current_sequence)
         prediction = np.clip(prediction, 0, 127)
         next_note = sample_with_temperature(prediction, temperature=temperature)
-        generated_notes.append(next_note)
-        next_note = np.reshape(next_note, (1, 1, 1))
-        current_sequence = np.append(current_sequence[:, 1:, :], next_note, axis=1)
+        next_note_constrained = constrain_to_scale(next_note)
+        generated_notes.append(next_note_constrained)
+        next_note_constrained = np.reshape(next_note_constrained, (1, 1, 1))
+        current_sequence = np.append(current_sequence[:, 1:, :], next_note_constrained, axis=1)
 
     return generated_notes
 
