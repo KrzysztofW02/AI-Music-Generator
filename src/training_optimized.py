@@ -21,6 +21,16 @@ def load_preprocessed_data_in_chunks(processed_data_path, chunk_size=1000):
                 inputs, targets = pickle.load(f)
                 inputs = np.expand_dims(np.array(inputs), axis=-1)
                 targets = np.array(targets)
+                if len(targets) % 4 == 0:
+                    targets = np.reshape(targets, (-1, 4))
+                else:
+                    remainder = len(targets) % 4
+                    targets = targets[:-remainder] 
+                    targets = np.reshape(targets, (-1, 4))
+                if len(inputs) != len(targets):
+                    min_samples = min(len(inputs), len(targets))
+                    inputs = inputs[:min_samples]
+                    targets = targets[:min_samples]
                 yield inputs, targets
             except EOFError:
                 break
