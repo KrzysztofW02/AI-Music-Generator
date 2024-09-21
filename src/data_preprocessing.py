@@ -25,7 +25,7 @@ def preprocess_data_chunked(all_midi_notes, sequence_length=50, chunk_size=1000)
 
         for i in range(0, len(pitches) - sequence_length):
             inputs.append(pitches[i:i+sequence_length])
-            targets.append(pitches[i+sequence_length])
+            targets.append(pitches[i+sequence_length:i+sequence_length+4])
         
         if len(inputs) >= chunk_size:
             save_preprocessed_chunk(inputs, targets)

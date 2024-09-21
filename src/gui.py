@@ -55,12 +55,14 @@ class MusicGeneratorApp(QWidget):
         if self.model is None:
             print("No model loaded!")
             return
-
         seed_sequence_length = np.random.randint(40, 60)
-        seed_sequence = np.random.rand(1, seed_sequence_length, 1)
+        
+        num_output_notes = 4 
+        seed_sequence = np.random.rand(1, seed_sequence_length, 4)
 
-        num_notes = np.random.randint(150, 200)  
+        num_notes = np.random.randint(150, 200) 
         generated_notes = generate_notes(self.model, seed_sequence, num_notes=num_notes, temperature=0.8)
+
         base_dir = Path(__file__).resolve().parent.parent
         midi_file_path = base_dir / 'data' / 'generated_music.mid'
         selected_instrument = self.instrument_dropdown.currentText()
@@ -69,8 +71,6 @@ class MusicGeneratorApp(QWidget):
         print(f"Music generated and saved to '{midi_file_path}'")
 
         self.open_midi_file(midi_file_path)
-
-
 
     def open_midi_dialog(self):
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
