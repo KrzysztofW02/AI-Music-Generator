@@ -53,27 +53,20 @@ def constrain_to_scale(note):
 
 def generate_notes(model, seed_sequence, num_notes=100, temperature=1.0):
     generated_notes = []
-    current_sequence = seed_sequence 
-
-    for step in range(num_notes):      
-        prediction = model.predict(current_sequence)
-        next_notes_with_temperature = [sample_with_temperature([note], temperature=temperature) for note in prediction[0]]
+    current_sequence = seed_sequence
+    for _ in range(num_notes):
+        try:
+            prediction = model.predict(current_sequence)
+        except Exception as e:
+            print(f"Error during prediction: {e}")
+            return None
+        next_notes_with_temperature = [
+            sample_with_temperature([note], temperature=temperature) for note in prediction[0]
+        ]
         constrained_notes = [constrain_to_scale(note) for note in next_notes_with_temperature]
         generated_notes.append(constrained_notes)
+
         next_notes_constrained = np.array(constrained_notes).reshape(1, 1, 4)
-        current_sequence = np.append(current_sequence[:, 1:, :], next_notes_constrained, axis=1)
-        
+        current_sequence = np.concatenate([current_sequence[:, 1:, :], next_notes_constrained], axis=1)
+
     return generated_notes
-
-
-
-
-
-
-
-
-
-
-
-
-

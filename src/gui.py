@@ -57,7 +57,6 @@ class MusicGeneratorApp(QWidget):
             return
         seed_sequence_length = np.random.randint(40, 60)
         
-        num_output_notes = 4 
         seed_sequence = np.random.rand(1, seed_sequence_length, 4)
 
         num_notes = np.random.randint(150, 200) 
