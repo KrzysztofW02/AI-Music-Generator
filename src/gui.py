@@ -3,7 +3,7 @@ import sys
 import subprocess
 import numpy as np
 import qtvscodestyle as qtvsc
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QFileDialog, QLabel, QComboBox, QHBoxLayout, QSpacerItem, QSizePolicy
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QFileDialog, QLabel, QComboBox, QHBoxLayout, QSpacerItem, QSizePolicy, QSpinBox
 from PyQt5.QtCore import Qt
 from src.model_training import load_model, generate_notes
 from src.midi_utils import create_midi_from_notes, instrument_programs
@@ -14,7 +14,7 @@ class MusicGeneratorApp(QWidget):
         super().__init__()
 
         self.setWindowTitle('AI Music Generator')
-        self.setGeometry(300, 300, 600, 150)
+        self.setGeometry(300, 300, 600, 200)
 
         self.layout = QVBoxLayout()
         self.model_label = QLabel('No model loaded', self)
@@ -35,8 +35,19 @@ class MusicGeneratorApp(QWidget):
         self.top_layout.addWidget(self.instrument_dropdown)
 
         self.layout.addLayout(self.top_layout)
-
         self.layout.addSpacerItem(QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.Fixed))
+
+        self.duration_layout = QHBoxLayout()
+        self.duration_label = QLabel('Duration (seconds):', self)
+        self.duration_layout.addWidget(self.duration_label)
+
+        self.duration_spinbox = QSpinBox(self)
+        self.duration_spinbox.setRange(1, 300)  
+        self.duration_spinbox.setValue(60)  
+        self.duration_layout.addWidget(self.duration_spinbox)
+
+        self.layout.addLayout(self.duration_layout)
+
         self.generate_button = QPushButton('Generate Music', self)
         self.generate_button.clicked.connect(self.generate_music)
         self.layout.addWidget(self.generate_button)
@@ -55,11 +66,14 @@ class MusicGeneratorApp(QWidget):
         if self.model is None:
             print("No model loaded!")
             return
+
+        duration = self.duration_spinbox.value()  
+        notes_per_second = 2  
+        num_notes = duration * notes_per_second  
+
         seed_sequence_length = np.random.randint(40, 60)
-        
         seed_sequence = np.random.rand(1, seed_sequence_length, 4)
 
-        num_notes = np.random.randint(150, 200) 
         generated_notes = generate_notes(self.model, seed_sequence, num_notes=num_notes, temperature=0.8)
 
         base_dir = Path(__file__).resolve().parent.parent
